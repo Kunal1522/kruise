@@ -4446,6 +4446,7 @@ func TestContainerRecreateRequest_ConvertTo(t *testing.T) {
 
 func TestContainerRecreateRequest_ConvertFrom(t *testing.T) {
 	ts := metav1.Time{Time: time.Date(2024, 6, 1, 10, 0, 0, 0, time.UTC)}
+	syncJSON := `[{"name":"app","ready":true,"restartCount":3,"containerID":"docker://abc123"}]`
 
 	tests := []struct {
 		name     string
@@ -4453,7 +4454,7 @@ func TestContainerRecreateRequest_ConvertFrom(t *testing.T) {
 		expected *ContainerRecreateRequest
 	}{
 		{
-			name: "all v1beta1 fields populated; new-only fields are dropped",
+			name: "all v1beta1 fields populated",
 			src: &v1beta1.ContainerRecreateRequest{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test-crr",
@@ -4509,6 +4510,9 @@ func TestContainerRecreateRequest_ConvertFrom(t *testing.T) {
 					Labels: map[string]string{
 						ContainerRecreateRequestPodUIDKey:   "uid-001",
 						ContainerRecreateRequestNodeNameKey: "node-1",
+					},
+					Annotations: map[string]string{
+						ContainerRecreateRequestSyncContainerStatusesKey: syncJSON,
 					},
 				},
 				Spec: ContainerRecreateRequestSpec{
